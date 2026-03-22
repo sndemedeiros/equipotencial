@@ -136,13 +136,12 @@ export const ExperimentalDataEntry: React.FC<Props> = ({ data, onChange, isExpor
         <div className="bg-white rounded-[32px] border border-slate-100 shadow-2xl shadow-slate-200/50 overflow-hidden">
           <div className="p-8 bg-slate-50/30 border-b border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Incerteza das Coordenadas (cm)</label>
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Incerteza das Coordenadas <span className="normal-case">(mm)</span></label>
               <input
                 type="text"
                 inputMode="decimal"
                 value={data.coordUncertainty}
                 onChange={(e) => onChange({ ...data, coordUncertainty: e.target.value.replace('.', ',') })}
-                placeholder=""
                 className="w-full p-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-slate-600 transition-all"
               />
             </div>
@@ -153,20 +152,20 @@ export const ExperimentalDataEntry: React.FC<Props> = ({ data, onChange, isExpor
                 inputMode="decimal"
                 value={data.voltageUncertainty}
                 onChange={(e) => onChange({ ...data, voltageUncertainty: e.target.value.replace('.', ',') })}
-                placeholder=""
                 className="w-full p-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-slate-600 transition-all"
               />
             </div>
           </div>
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="bg-slate-50/50 border-b border-slate-100">
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Coordenada X (cm)</th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Coordenada Y (cm)</th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Potencial (V)</th>
-                <th className="px-6 py-4 w-16"></th>
-              </tr>
-            </thead>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse min-w-[600px]">
+              <thead>
+                <tr className="bg-slate-50/50 border-b border-slate-100">
+                  <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Coordenada X <span className="normal-case">(mm)</span></th>
+                  <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Coordenada Y <span className="normal-case">(mm)</span></th>
+                  <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Potencial (V)</th>
+                  <th className="px-6 py-4 w-16"></th>
+                </tr>
+              </thead>
             <tbody className="divide-y divide-slate-50">
               {data.points.map((point) => (
                 <tr key={point.id} className="group hover:bg-slate-50/30 transition-colors">
@@ -176,7 +175,6 @@ export const ExperimentalDataEntry: React.FC<Props> = ({ data, onChange, isExpor
                       inputMode="decimal"
                       value={point.x}
                       onChange={(e) => updatePoint(point.id, 'x', e.target.value.replace('.', ','))}
-                      placeholder=""
                       className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-slate-700 font-medium text-lg transition-all"
                     />
                   </td>
@@ -186,7 +184,6 @@ export const ExperimentalDataEntry: React.FC<Props> = ({ data, onChange, isExpor
                       inputMode="decimal"
                       value={point.y}
                       onChange={(e) => updatePoint(point.id, 'y', e.target.value.replace('.', ','))}
-                      placeholder=""
                       className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-slate-700 font-medium text-lg transition-all"
                     />
                   </td>
@@ -196,7 +193,6 @@ export const ExperimentalDataEntry: React.FC<Props> = ({ data, onChange, isExpor
                       inputMode="decimal"
                       value={point.v}
                       onChange={(e) => updatePoint(point.id, 'v', e.target.value.replace('.', ','))}
-                      placeholder=""
                       className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-blue-600 font-bold text-lg transition-all"
                     />
                   </td>
@@ -219,6 +215,7 @@ export const ExperimentalDataEntry: React.FC<Props> = ({ data, onChange, isExpor
               )}
             </tbody>
           </table>
+          </div>
           <div className="p-6 bg-slate-50/30 flex justify-center border-t border-slate-100">
             <button
               onClick={addPoint}
@@ -242,24 +239,22 @@ export const ExperimentalDataEntry: React.FC<Props> = ({ data, onChange, isExpor
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-8 bg-white rounded-[32px] border border-slate-100 shadow-sm">
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase">Distância entre Eletrodos (mm)</label>
+              <label className="text-xs font-bold text-slate-500 uppercase">Distância entre Eletrodos <span className="normal-case">(mm)</span></label>
               <input
                 type="text"
                 inputMode="decimal"
                 value={data.plateDistance}
                 onChange={(e) => onChange({ ...data, plateDistance: e.target.value.replace('.', ',') })}
-                placeholder=""
                 className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 outline-none font-bold text-lg transition-all"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase">Incerteza (mm)</label>
+              <label className="text-xs font-bold text-slate-500 uppercase">Incerteza <span className="normal-case">(mm)</span></label>
               <input
                 type="text"
                 inputMode="decimal"
                 value={data.plateDistanceUncertainty}
                 onChange={(e) => onChange({ ...data, plateDistanceUncertainty: e.target.value.replace('.', ',') })}
-                placeholder=""
                 className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 outline-none text-slate-600 transition-all"
               />
             </div>
@@ -277,16 +272,17 @@ export const ExperimentalDataEntry: React.FC<Props> = ({ data, onChange, isExpor
             <div className="p-4 bg-slate-50/50 border-b border-slate-100 flex justify-between items-center">
               <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">Tabela de Medidas</h5>
             </div>
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-slate-50/50 border-b border-slate-100">
-                  <th className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Va (V)</th>
-                  <th className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Vb (V)</th>
-                  <th className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Distância (mm)</th>
-                  <th className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Incerteza (mm)</th>
-                  <th className="px-6 py-4 w-16"></th>
-                </tr>
-              </thead>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse min-w-[600px]">
+                <thead>
+                  <tr className="bg-slate-50/50 border-b border-slate-100">
+                    <th className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Va (V)</th>
+                    <th className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Vb (V)</th>
+                    <th className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Distância <span className="normal-case">(mm)</span></th>
+                    <th className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Incerteza <span className="normal-case">(mm)</span></th>
+                    <th className="px-6 py-4 w-16"></th>
+                  </tr>
+                </thead>
               <tbody className="divide-y divide-slate-50">
                 {data.fieldMeasurements.map((m) => (
                   <tr key={m.id} className="group hover:bg-slate-50/30 transition-colors">
@@ -296,7 +292,6 @@ export const ExperimentalDataEntry: React.FC<Props> = ({ data, onChange, isExpor
                         inputMode="decimal"
                         value={m.vA}
                         onChange={(e) => updateFieldMeasurement(m.id, 'vA', e.target.value.replace('.', ','))}
-                        placeholder=""
                         className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-slate-700 font-bold transition-all"
                       />
                     </td>
@@ -306,7 +301,6 @@ export const ExperimentalDataEntry: React.FC<Props> = ({ data, onChange, isExpor
                         inputMode="decimal"
                         value={m.vB}
                         onChange={(e) => updateFieldMeasurement(m.id, 'vB', e.target.value.replace('.', ','))}
-                        placeholder=""
                         className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-slate-700 font-bold transition-all"
                       />
                     </td>
@@ -316,7 +310,6 @@ export const ExperimentalDataEntry: React.FC<Props> = ({ data, onChange, isExpor
                         inputMode="decimal"
                         value={m.distance}
                         onChange={(e) => updateFieldMeasurement(m.id, 'distance', e.target.value.replace('.', ','))}
-                        placeholder=""
                         className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-blue-600 font-bold transition-all"
                       />
                     </td>
@@ -326,7 +319,6 @@ export const ExperimentalDataEntry: React.FC<Props> = ({ data, onChange, isExpor
                         inputMode="decimal"
                         value={m.uncertainty}
                         onChange={(e) => updateFieldMeasurement(m.id, 'uncertainty', e.target.value.replace('.', ','))}
-                        placeholder=""
                         className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-slate-400 text-sm transition-all"
                       />
                     </td>
@@ -351,6 +343,7 @@ export const ExperimentalDataEntry: React.FC<Props> = ({ data, onChange, isExpor
                 )}
               </tbody>
             </table>
+            </div>
             {!isExporting && (
               <div className="p-4 bg-slate-50/30 flex justify-center border-t border-slate-100">
                 <button

@@ -46,15 +46,15 @@ export const FieldCalculator: React.FC<{ isExporting?: boolean }> = ({ isExporti
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
+        <table className="w-full border-collapse min-w-[700px]">
           <thead>
             <tr className="border-b border-slate-100">
-              <th className="px-2 py-4 text-left text-[9px] font-black text-slate-400 uppercase tracking-widest">ΔV [V]</th>
-              <th className="px-2 py-4 text-left text-[9px] font-black text-slate-300 uppercase tracking-widest">Incerteza ΔV [V]</th>
-              <th className="px-2 py-4 text-left text-[9px] font-black text-slate-400 uppercase tracking-widest">Δs [m]</th>
-              <th className="px-2 py-4 text-left text-[9px] font-black text-slate-300 uppercase tracking-widest">Incerteza Δs [m]</th>
-              <th className="px-2 py-4 text-left text-[9px] font-black text-blue-400 uppercase tracking-widest">E [V/m]</th>
-              <th className="px-2 py-4 text-left text-[9px] font-black text-blue-400 uppercase tracking-widest">Incerteza E [V/m]</th>
+              <th className="px-2 py-4 text-left text-[9px] font-black text-slate-400 uppercase tracking-widest">ΔV <span className="normal-case">[V]</span></th>
+              <th className="px-2 py-4 text-left text-[9px] font-black text-slate-300 uppercase tracking-widest">Incerteza ΔV <span className="normal-case">[V]</span></th>
+              <th className="px-2 py-4 text-left text-[9px] font-black text-slate-400 uppercase tracking-widest">Δs <span className="normal-case">[mm]</span></th>
+              <th className="px-2 py-4 text-left text-[9px] font-black text-slate-300 uppercase tracking-widest">Incerteza Δs <span className="normal-case">[mm]</span></th>
+              <th className="px-2 py-4 text-left text-[9px] font-black text-blue-400 uppercase tracking-widest">E <span className="normal-case">[V/mm]</span></th>
+              <th className="px-2 py-4 text-left text-[9px] font-black text-blue-400 uppercase tracking-widest">Incerteza E <span className="normal-case">[V/mm]</span></th>
               {!isExporting && <th className="px-2 py-4 w-10"></th>}
             </tr>
           </thead>
@@ -67,7 +67,6 @@ export const FieldCalculator: React.FC<{ isExporting?: boolean }> = ({ isExporti
                     inputMode="decimal"
                     value={calc.voltage}
                     onChange={(e) => updateCalculation(calc.id, 'voltage', e.target.value.replace('.', ','))}
-                    placeholder=""
                     className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-slate-700 font-bold transition-all"
                   />
                 </td>
@@ -77,7 +76,6 @@ export const FieldCalculator: React.FC<{ isExporting?: boolean }> = ({ isExporti
                     inputMode="decimal"
                     value={calc.uVoltage}
                     onChange={(e) => updateCalculation(calc.id, 'uVoltage', e.target.value.replace('.', ','))}
-                    placeholder=""
                     className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-slate-400 transition-all"
                   />
                 </td>
@@ -87,7 +85,6 @@ export const FieldCalculator: React.FC<{ isExporting?: boolean }> = ({ isExporti
                     inputMode="decimal"
                     value={calc.distance}
                     onChange={(e) => updateCalculation(calc.id, 'distance', e.target.value.replace('.', ','))}
-                    placeholder=""
                     className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-slate-700 font-bold transition-all"
                   />
                 </td>
@@ -97,7 +94,6 @@ export const FieldCalculator: React.FC<{ isExporting?: boolean }> = ({ isExporti
                     inputMode="decimal"
                     value={calc.uDistance}
                     onChange={(e) => updateCalculation(calc.id, 'uDistance', e.target.value.replace('.', ','))}
-                    placeholder=""
                     className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-slate-400 transition-all"
                   />
                 </td>
@@ -107,7 +103,6 @@ export const FieldCalculator: React.FC<{ isExporting?: boolean }> = ({ isExporti
                     inputMode="decimal"
                     value={calc.studentField}
                     onChange={(e) => updateCalculation(calc.id, 'studentField', e.target.value.replace('.', ','))}
-                    placeholder=""
                     className="w-full p-2 bg-blue-50/50 border border-blue-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-blue-600 font-bold transition-all"
                   />
                 </td>
@@ -117,7 +112,6 @@ export const FieldCalculator: React.FC<{ isExporting?: boolean }> = ({ isExporti
                     inputMode="decimal"
                     value={calc.studentUncertainty}
                     onChange={(e) => updateCalculation(calc.id, 'studentUncertainty', e.target.value.replace('.', ','))}
-                    placeholder=""
                     className="w-full p-2 bg-blue-50/50 border border-blue-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-blue-400 font-bold transition-all"
                   />
                 </td>

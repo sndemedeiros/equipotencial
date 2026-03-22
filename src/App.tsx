@@ -621,7 +621,7 @@ function ExperimentContent({
             <div className="bg-white rounded-[40px] p-10 shadow-sm border border-slate-100 space-y-10">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {[
-                  { title: "Montagem Experimental", desc: "Fixe os eletrodos na cuba e conecte à fonte (10V DC). Adicione água até cobrir a base dos eletrodos (~1,5cm)." },
+                  { title: "Montagem Experimental", desc: "Fixe os eletrodos na cuba e conecte à fonte (10V DC). Adicione água até cobrir a base dos eletrodos (~15mm)." },
                   { title: "Mapeamento", desc: "Use a ponta de prova para achar 6 pontos de mesmo potencial. Marque-os no papel milimetrado e anote as coordenadas." },
                   { title: "Campo Elétrico", desc: "Meça a distância entre equipotenciais e calcule o módulo do campo usando ΔV/Δs." }
                 ].map((step, i) => (
