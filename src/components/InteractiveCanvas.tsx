@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useImperativeHandle, forwardRef } from 'react';
-import { Pencil, Eraser, Undo2, Redo2, Circle, Minus, ArrowUpRight, MousePointer2, Trash2, Type } from 'lucide-react';
+import { Pencil, Eraser, Undo2, Redo2, Circle, Minus, Plus, ArrowUpRight, MousePointer2, Trash2, Type } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 
 interface CanvasProps {
@@ -28,6 +28,7 @@ export const InteractiveCanvas = forwardRef<CanvasHandle, CanvasProps>(({ classN
   const [paths, setPaths] = useState<Path[]>([]);
   const [redoStack, setRedoStack] = useState<Path[]>([]);
   const [currentPath, setCurrentPath] = useState<{ x: number; y: number }[]>([]);
+  const [zoom, setZoom] = useState(1);
   const [textInput, setTextInput] = useState<{ x: number; y: number; value: string } | null>(null);
   const textInputRef = useRef<HTMLInputElement>(null);
 
@@ -76,26 +77,30 @@ export const InteractiveCanvas = forwardRef<CanvasHandle, CanvasProps>(({ classN
   const drawGrid = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
     const centerX = width / 2;
     const centerY = height / 2;
-    const step = 25; // 25px per unit
+    const baseStep = 25;
+    const step = baseStep * zoom;
 
     ctx.strokeStyle = '#e2e8f0'; // slate-200
     ctx.lineWidth = 0.5;
 
-    // Small grid (5px)
-    for (let x = 0; x <= width; x += 5) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, height);
-      ctx.stroke();
-    }
-    for (let y = 0; y <= height; y += 5) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(width, y);
-      ctx.stroke();
+    // Small grid (5px base)
+    const smallStep = 5 * zoom;
+    if (smallStep > 2) { // Don't draw if too small
+      for (let x = centerX % smallStep; x <= width; x += smallStep) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = centerY % smallStep; y <= height; y += smallStep) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
     }
 
-    // Unit grid (25px)
+    // Unit grid (25px base)
     ctx.strokeStyle = '#cbd5e1'; // slate-300
     ctx.lineWidth = 1;
     for (let x = centerX % step; x <= width; x += step) {
@@ -129,17 +134,22 @@ export const InteractiveCanvas = forwardRef<CanvasHandle, CanvasProps>(({ classN
 
     // Numbering
     ctx.fillStyle = '#475569'; // slate-600
-    ctx.font = 'bold 10px Inter, sans-serif';
+    ctx.font = `bold ${Math.max(8, 10 * Math.sqrt(zoom))}px Inter, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
 
     // X Axis Numbering (-100 to 100 mm)
+    // Only show labels that fit
+    const labelFrequency = zoom < 0.5 ? 4 : zoom < 0.8 ? 2 : 1;
+
     for (let i = -10; i <= 10; i++) {
       if (i === 0) continue;
       const x = centerX + i * step;
       const label = (i * 10).toString(); // Convert to mm
       if (x >= 0 && x <= width) {
-        ctx.fillText(label, x, centerY + 5);
+        if (i % labelFrequency === 0) {
+          ctx.fillText(label, x, centerY + 5);
+        }
         // Tick
         ctx.beginPath();
         ctx.moveTo(x, centerY - 3);
@@ -156,7 +166,9 @@ export const InteractiveCanvas = forwardRef<CanvasHandle, CanvasProps>(({ classN
       const y = centerY - i * step; // Invert Y for standard coordinate system
       const label = (i * 10).toString(); // Convert to mm
       if (y >= 0 && y <= height) {
-        ctx.fillText(label, centerX - 5, y);
+        if (i % labelFrequency === 0) {
+          ctx.fillText(label, centerX - 5, y);
+        }
         // Tick
         ctx.beginPath();
         ctx.moveTo(centerX - 3, y);
@@ -171,7 +183,7 @@ export const InteractiveCanvas = forwardRef<CanvasHandle, CanvasProps>(({ classN
     ctx.fillText("0", centerX - 5, centerY + 5);
 
     // Axis Labels
-    ctx.font = 'italic bold 12px Inter, sans-serif';
+    ctx.font = `italic bold ${Math.max(10, 12 * Math.sqrt(zoom))}px Inter, sans-serif`;
     ctx.fillText("x (mm)", width - 10, centerY + 15);
     ctx.textAlign = 'left';
     ctx.fillText("y (mm)", centerX + 10, 15);
@@ -194,8 +206,8 @@ export const InteractiveCanvas = forwardRef<CanvasHandle, CanvasProps>(({ classN
 
     // Transform points to screen coordinates
     const screenPoints = path.points.map(p => ({
-      x: centerX + p.x,
-      y: centerY - p.y // Invert Y
+      x: centerX + p.x * zoom,
+      y: centerY - p.y * zoom // Invert Y
     }));
 
     const start = screenPoints[0];
@@ -283,7 +295,7 @@ export const InteractiveCanvas = forwardRef<CanvasHandle, CanvasProps>(({ classN
 
   useEffect(() => {
     redraw();
-  }, [paths, currentPath]);
+  }, [paths, currentPath, zoom]);
 
   const redraw = () => {
     const canvas = canvasRef.current;
@@ -325,8 +337,8 @@ export const InteractiveCanvas = forwardRef<CanvasHandle, CanvasProps>(({ classN
     const centerY = canvas.height / 2;
 
     // Convert to centered coordinates
-    const x = screenX - centerX;
-    const y = centerY - screenY; // Invert Y
+    const x = (screenX - centerX) / zoom;
+    const y = (centerY - screenY) / zoom; // Invert Y
 
     if (tool === 'text') {
       if (textInput) {
@@ -365,8 +377,8 @@ export const InteractiveCanvas = forwardRef<CanvasHandle, CanvasProps>(({ classN
     const centerY = canvas.height / 2;
 
     // Convert to centered coordinates
-    const x = screenX - centerX;
-    const y = centerY - screenY; // Invert Y
+    const x = (screenX - centerX) / zoom;
+    const y = (centerY - screenY) / zoom; // Invert Y
 
     if (tool === 'pencil' || tool === 'eraser') {
       setCurrentPath(prev => [...prev, { x, y }]);
@@ -510,6 +522,33 @@ export const InteractiveCanvas = forwardRef<CanvasHandle, CanvasProps>(({ classN
             <Trash2 size={20} />
           </button>
         </div>
+
+        <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-xl">
+          <button 
+            onClick={() => setZoom(prev => Math.max(0.2, prev - 0.1))} 
+            className="p-2 text-slate-500 hover:text-blue-600 hover:bg-white hover:shadow-sm rounded-lg transition-all"
+            title="Diminuir Zoom"
+          >
+            <Minus size={18} />
+          </button>
+          <div className="px-2 text-[10px] font-black text-slate-400 min-w-[45px] text-center uppercase tracking-tighter">
+            {Math.round(zoom * 100)}%
+          </div>
+          <button 
+            onClick={() => setZoom(prev => Math.min(5, prev + 0.1))} 
+            className="p-2 text-slate-500 hover:text-blue-600 hover:bg-white hover:shadow-sm rounded-lg transition-all"
+            title="Aumentar Zoom"
+          >
+            <Plus size={18} />
+          </button>
+          <button 
+            onClick={() => setZoom(1)} 
+            className="p-2 text-slate-400 hover:text-slate-600 text-[10px] font-black uppercase tracking-widest px-3"
+            title="Resetar Zoom"
+          >
+            100%
+          </button>
+        </div>
       </div>
 
       <div className={cn(
@@ -533,8 +572,8 @@ export const InteractiveCanvas = forwardRef<CanvasHandle, CanvasProps>(({ classN
             onSubmit={handleTextSubmit}
             className="absolute z-50 pointer-events-auto"
             style={{
-              left: (canvasRef.current?.width || 0) / 2 + textInput.x,
-              top: (canvasRef.current?.height || 0) / 2 - textInput.y,
+              left: (canvasRef.current?.width || 0) / 2 + textInput.x * zoom,
+              top: (canvasRef.current?.height || 0) / 2 - textInput.y * zoom,
               transform: 'translate(-50%, -50%)'
             }}
             onClick={(e) => e.stopPropagation()}
