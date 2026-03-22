@@ -54,7 +54,6 @@ export const InteractiveCanvas = forwardRef<CanvasHandle, CanvasProps>(({ classN
       const canvas = canvasRef.current;
       if (!canvas) return '';
       
-      // Create a temporary canvas with white background and grid for export
       const tempCanvas = document.createElement('canvas');
       tempCanvas.width = canvas.width;
       tempCanvas.height = canvas.height;
@@ -64,13 +63,11 @@ export const InteractiveCanvas = forwardRef<CanvasHandle, CanvasProps>(({ classN
       tempCtx.fillStyle = 'white';
       tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
       
-      // Draw grid on temp canvas
       drawGrid(tempCtx, tempCanvas.width, tempCanvas.height);
       
-      // Draw paths
       tempCtx.lineCap = 'round';
       tempCtx.lineJoin = 'round';
-      paths.forEach(p => drawPathOnCtx(tempCtx, p));
+      paths.forEach(p => drawPathOnCtx(tempCtx, p, tempCanvas.width / 2, tempCanvas.height / 2));
 
       return tempCanvas.toDataURL('image/png');
     }
@@ -180,13 +177,8 @@ export const InteractiveCanvas = forwardRef<CanvasHandle, CanvasProps>(({ classN
     ctx.fillText("y (mm)", centerX + 10, 15);
   };
 
-  const drawPathOnCtx = (ctx: CanvasRenderingContext2D, path: Path) => {
+  const drawPathOnCtx = (ctx: CanvasRenderingContext2D, path: Path, centerX: number, centerY: number) => {
     if (path.points.length === 0) return;
-
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
 
     ctx.strokeStyle = path.color;
     ctx.fillStyle = path.color;
@@ -241,10 +233,11 @@ export const InteractiveCanvas = forwardRef<CanvasHandle, CanvasProps>(({ classN
         break;
 
       case 'arrow':
-        const headlen = 10;
+        const headlen = 15;
         const dx = end.x - start.x;
         const dy = end.y - start.y;
         const angle = Math.atan2(dy, dx);
+        
         ctx.beginPath();
         ctx.moveTo(start.x, start.y);
         ctx.lineTo(end.x, end.y);
@@ -307,7 +300,7 @@ export const InteractiveCanvas = forwardRef<CanvasHandle, CanvasProps>(({ classN
     ctx.lineJoin = 'round';
 
     // Draw all completed paths
-    paths.forEach(p => drawPathOnCtx(ctx, p));
+    paths.forEach(p => drawPathOnCtx(ctx, p, canvas.width / 2, canvas.height / 2));
 
     // Draw current path
     if (currentPath.length > 0) {
@@ -316,7 +309,7 @@ export const InteractiveCanvas = forwardRef<CanvasHandle, CanvasProps>(({ classN
         points: currentPath,
         color: tool === 'eraser' ? '#F8FAFC' : color,
         width: tool === 'eraser' ? 20 : 3
-      });
+      }, canvas.width / 2, canvas.height / 2);
     }
   };
 
@@ -376,10 +369,10 @@ export const InteractiveCanvas = forwardRef<CanvasHandle, CanvasProps>(({ classN
     const y = centerY - screenY; // Invert Y
 
     if (tool === 'pencil' || tool === 'eraser') {
-      setCurrentPath([...currentPath, { x, y }]);
+      setCurrentPath(prev => [...prev, { x, y }]);
     } else {
       // For shapes, we only need start and current end point
-      setCurrentPath([currentPath[0], { x, y }]);
+      setCurrentPath(prev => [prev[0], { x, y }]);
     }
   };
 
@@ -414,11 +407,9 @@ export const InteractiveCanvas = forwardRef<CanvasHandle, CanvasProps>(({ classN
   };
 
   const clearCanvas = () => {
-    if (window.confirm('Deseja limpar todo o papel milimetrado?')) {
-      setPaths([]);
-      setRedoStack([]);
-      setTextInput(null);
-    }
+    setPaths([]);
+    setRedoStack([]);
+    setTextInput(null);
   };
 
   const handleTextSubmit = (e: React.FormEvent) => {
