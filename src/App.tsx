@@ -162,6 +162,11 @@ const IdentificationPage = ({
             Voltar ao Início
           </button>
           <div className="space-y-1">
+            <div className="space-y-0.5 mb-4">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Universidade Federal do Rio Grande do Norte</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Centro de Ciências Exatas e da Terra</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Departamento de Física Teórica e Experimental</p>
+            </div>
             <h2 className="text-4xl font-black text-slate-900 tracking-tight">Identificação do Grupo</h2>
             <p className="text-slate-500 text-lg">Insira os dados da turma e dos componentes para o relatório.</p>
           </div>
@@ -468,6 +473,11 @@ function ExperimentContent({
             </div>
             
             <div className="space-y-6">
+              <div className="space-y-1 mb-6">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">Universidade Federal do Rio Grande do Norte</p>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">Centro de Ciências Exatas e da Terra</p>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">Departamento de Física Teórica e Experimental</p>
+              </div>
               <p className="text-[11px] font-black text-blue-600 uppercase tracking-[0.4em]">Relatório de Atividade Experimental</p>
               <h1 className="text-7xl font-black text-slate-900 tracking-tighter leading-[0.85]">
                 Superfícies<br />Equipotenciais
