@@ -464,7 +464,13 @@ function ExperimentContent({
         {isExporting ? "Gerando PDF..." : "Gerar Relatório PDF"}
       </button>
 
-      <div ref={reportRef} className="max-w-4xl mx-auto bg-white shadow-2xl shadow-slate-200 my-8 rounded-[32px] overflow-hidden border border-slate-100">
+      <div 
+        ref={reportRef} 
+        className={cn(
+          "mx-auto bg-white shadow-2xl shadow-slate-200 my-8 rounded-[32px] overflow-hidden border border-slate-100",
+          isExporting ? "w-[1024px] max-w-none" : "max-w-4xl"
+        )}
+      >
         {/* Institutional Cover */}
         <section className="min-h-[90vh] flex flex-col items-center justify-center p-16 text-center">
           <div className="space-y-12">

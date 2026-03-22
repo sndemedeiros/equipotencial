@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Calculator as CalcIcon, Info, Plus, Trash2 } from 'lucide-react';
+import { cn } from '@/src/lib/utils';
 
 interface Calculation {
   id: string;
@@ -45,8 +46,8 @@ export const FieldCalculator: React.FC<{ isExporting?: boolean }> = ({ isExporti
         </p>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse min-w-[700px]">
+      <div className={cn(isExporting ? "overflow-visible" : "overflow-x-auto")}>
+        <table className={cn("w-full border-collapse", !isExporting && "min-w-[700px]")}>
           <thead>
             <tr className="border-b border-slate-100">
               <th className="px-2 py-4 text-left text-[9px] font-black text-slate-400 uppercase tracking-widest">ΔV <span className="normal-case">[V]</span></th>

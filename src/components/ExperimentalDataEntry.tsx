@@ -156,14 +156,14 @@ export const ExperimentalDataEntry: React.FC<Props> = ({ data, onChange, isExpor
               />
             </div>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse min-w-[600px]">
+          <div className={cn(isExporting ? "overflow-visible" : "overflow-x-auto")}>
+            <table className={cn("w-full border-collapse", !isExporting && "min-w-[600px]")}>
               <thead>
                 <tr className="bg-slate-50/50 border-b border-slate-100">
                   <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Coordenada X <span className="normal-case">(mm)</span></th>
                   <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Coordenada Y <span className="normal-case">(mm)</span></th>
                   <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Potencial (V)</th>
-                  <th className="px-6 py-4 w-16"></th>
+                  {!isExporting && <th className="px-6 py-4 w-16"></th>}
                 </tr>
               </thead>
             <tbody className="divide-y divide-slate-50">
@@ -197,12 +197,14 @@ export const ExperimentalDataEntry: React.FC<Props> = ({ data, onChange, isExpor
                     />
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <button
-                      onClick={() => removePoint(point.id)}
-                      className="p-2 text-slate-200 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
-                    >
-                      <Trash2 size={18} />
-                    </button>
+                    {!isExporting && (
+                      <button
+                        onClick={() => removePoint(point.id)}
+                        className="p-2 text-slate-200 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -272,15 +274,15 @@ export const ExperimentalDataEntry: React.FC<Props> = ({ data, onChange, isExpor
             <div className="p-4 bg-slate-50/50 border-b border-slate-100 flex justify-between items-center">
               <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">Tabela de Medidas</h5>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse min-w-[600px]">
+            <div className={cn(isExporting ? "overflow-visible" : "overflow-x-auto")}>
+              <table className={cn("w-full border-collapse", !isExporting && "min-w-[600px]")}>
                 <thead>
                   <tr className="bg-slate-50/50 border-b border-slate-100">
                     <th className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Va (V)</th>
                     <th className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Vb (V)</th>
                     <th className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Distância <span className="normal-case">(mm)</span></th>
                     <th className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Incerteza <span className="normal-case">(mm)</span></th>
-                    <th className="px-6 py-4 w-16"></th>
+                    {!isExporting && <th className="px-6 py-4 w-16"></th>}
                   </tr>
                 </thead>
               <tbody className="divide-y divide-slate-50">
