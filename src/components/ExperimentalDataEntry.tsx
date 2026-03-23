@@ -1,20 +1,13 @@
 import React from 'react';
 import { Plus, Trash2, Table as TableIcon, Ruler, Zap, Target } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
+import { InteractiveCanvas } from './InteractiveCanvas';
 
 export interface EquipotentialPoint {
   id: string;
   x: string;
   y: string;
   v: string;
-}
-
-export interface FieldMeasurement {
-  id: string;
-  vA: string;
-  vB: string;
-  distance: string;
-  uncertainty: string;
 }
 
 export interface ExperimentalData {
@@ -25,7 +18,6 @@ export interface ExperimentalData {
   plateDistanceUncertainty: string;
   coordUncertainty: string;
   voltageUncertainty: string;
-  fieldMeasurements: FieldMeasurement[];
 }
 
 interface Props {
@@ -53,28 +45,6 @@ export const ExperimentalDataEntry: React.FC<Props> = ({ data, onChange, isExpor
     onChange({
       ...data,
       points: data.points.map((p) => (p.id === id ? { ...p, [field]: value } : p)),
-    });
-  };
-
-  const addFieldMeasurement = () => {
-    const newMeasure: FieldMeasurement = {
-      id: Math.random().toString(36).substr(2, 9),
-      vA: '',
-      vB: '',
-      distance: '',
-      uncertainty: '',
-    };
-    onChange({ ...data, fieldMeasurements: [...data.fieldMeasurements, newMeasure] });
-  };
-
-  const removeFieldMeasurement = (id: string) => {
-    onChange({ ...data, fieldMeasurements: data.fieldMeasurements.filter((m) => m.id !== id) });
-  };
-
-  const updateFieldMeasurement = (id: string, field: keyof FieldMeasurement, value: string) => {
-    onChange({
-      ...data,
-      fieldMeasurements: data.fieldMeasurements.map((m) => (m.id === id ? { ...m, [field]: value } : m)),
     });
   };
 
@@ -230,137 +200,18 @@ export const ExperimentalDataEntry: React.FC<Props> = ({ data, onChange, isExpor
         </div>
       </section>
 
-      <div className="grid grid-cols-1 gap-12">
-        {/* 2. Distance Between Plates */}
-        <section className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Ruler className="text-blue-500" size={20} />
-              <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest">Parâmetros Fixos da Geometria</h4>
-            </div>
+      {/* Papel Milimetrado */}
+      <section className="space-y-8">
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-slate-900 rounded-2xl text-white shadow-lg shadow-slate-200">
+            <Ruler size={24} />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-8 bg-white rounded-[32px] border border-slate-100 shadow-sm">
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase">Distância entre Eletrodos <span className="normal-case">(mm)</span></label>
-              <input
-                type="text"
-                inputMode="decimal"
-                value={data.plateDistance}
-                onChange={(e) => onChange({ ...data, plateDistance: e.target.value.replace('.', ',') })}
-                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 outline-none font-bold text-lg transition-all"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase">Incerteza <span className="normal-case">(mm)</span></label>
-              <input
-                type="text"
-                inputMode="decimal"
-                value={data.plateDistanceUncertainty}
-                onChange={(e) => onChange({ ...data, plateDistanceUncertainty: e.target.value.replace('.', ',') })}
-                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 outline-none text-slate-600 transition-all"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* 3. Distance between two equipotential lines - MULTIPLE */}
-        <section className="space-y-6">
-          <div className="flex items-center gap-3">
-            <Zap className="text-blue-500" size={20} />
-            <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest">Medidas de Diferença de Potencial e Distância</h4>
-          </div>
-          
-          <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">
-            <div className="p-4 bg-slate-50/50 border-b border-slate-100 flex justify-between items-center">
-              <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">Tabela de Medidas</h5>
-            </div>
-            <div className={cn(isExporting ? "overflow-visible" : "overflow-x-auto")}>
-              <table className={cn("w-full border-collapse", !isExporting && "min-w-[600px]")}>
-                <thead>
-                  <tr className="bg-slate-50/50 border-b border-slate-100">
-                    <th className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Va (V)</th>
-                    <th className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Vb (V)</th>
-                    <th className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Distância <span className="normal-case">(mm)</span></th>
-                    <th className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Incerteza <span className="normal-case">(mm)</span></th>
-                    {!isExporting && <th className="px-6 py-4 w-16"></th>}
-                  </tr>
-                </thead>
-              <tbody className="divide-y divide-slate-50">
-                {data.fieldMeasurements.map((m) => (
-                  <tr key={m.id} className="group hover:bg-slate-50/30 transition-colors">
-                    <td className="px-4 py-3">
-                      <input
-                        type="text"
-                        inputMode="decimal"
-                        value={m.vA}
-                        onChange={(e) => updateFieldMeasurement(m.id, 'vA', e.target.value.replace('.', ','))}
-                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-slate-700 font-bold transition-all"
-                      />
-                    </td>
-                    <td className="px-4 py-3">
-                      <input
-                        type="text"
-                        inputMode="decimal"
-                        value={m.vB}
-                        onChange={(e) => updateFieldMeasurement(m.id, 'vB', e.target.value.replace('.', ','))}
-                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-slate-700 font-bold transition-all"
-                      />
-                    </td>
-                    <td className="px-4 py-3">
-                      <input
-                        type="text"
-                        inputMode="decimal"
-                        value={m.distance}
-                        onChange={(e) => updateFieldMeasurement(m.id, 'distance', e.target.value.replace('.', ','))}
-                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-blue-600 font-bold transition-all"
-                      />
-                    </td>
-                    <td className="px-4 py-3">
-                      <input
-                        type="text"
-                        inputMode="decimal"
-                        value={m.uncertainty}
-                        onChange={(e) => updateFieldMeasurement(m.id, 'uncertainty', e.target.value.replace('.', ','))}
-                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-slate-400 text-sm transition-all"
-                      />
-                    </td>
-                    {!isExporting && (
-                      <td className="px-4 py-3 text-right">
-                        <button
-                          onClick={() => removeFieldMeasurement(m.id)}
-                          className="p-2 text-slate-200 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </td>
-                    )}
-                  </tr>
-                ))}
-                {data.fieldMeasurements.length === 0 && (
-                  <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-slate-300 italic text-sm">
-                      Nenhuma medida de distância entre equipotenciais adicionada.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-            </div>
-            {!isExporting && (
-              <div className="p-4 bg-slate-50/30 flex justify-center border-t border-slate-100">
-                <button
-                  onClick={addFieldMeasurement}
-                  className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold shadow-sm hover:bg-slate-50 transition-all text-xs"
-                >
-                  <Plus size={16} />
-                  ADICIONAR MEDIDA
-                </button>
-              </div>
-            )}
-          </div>
-        </section>
-        {/* No clear buttons here */}
-      </div>
+          <h3 className="text-2xl font-black text-slate-900 tracking-tight">Papel Milimetrado</h3>
+        </div>
+        <div className="bg-white rounded-[40px] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden h-[800px]">
+          <InteractiveCanvas />
+        </div>
+      </section>
     </div>
   );
 };

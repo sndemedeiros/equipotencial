@@ -18,13 +18,14 @@ import {
   ChevronLeft,
   Settings,
   Trash2,
-  Plus
+  Plus,
+  Ruler
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
-import { InteractiveCanvas, CanvasHandle } from './components/InteractiveCanvas';
+import { CanvasHandle } from './components/InteractiveCanvas';
 import { FieldCalculator } from './components/FieldCalculator';
 import { ExperimentalDataEntry, ExperimentalData } from './components/ExperimentalDataEntry';
-import { toPng } from 'html-to-image';
+import { toJpeg } from 'html-to-image';
 import jsPDF from 'jspdf';
 
 // --- Components ---
@@ -327,7 +328,6 @@ export default function App() {
       plateDistanceUncertainty: '',
       coordUncertainty: '',
       voltageUncertainty: '',
-      fieldMeasurements: [],
     }
   ]);
 
@@ -379,7 +379,8 @@ function ExperimentContent({
       points: [],
       plateDistance: '',
       plateDistanceUncertainty: '',
-      fieldMeasurements: [],
+      coordUncertainty: '',
+      voltageUncertainty: '',
     }]);
   };
 
@@ -401,14 +402,22 @@ function ExperimentContent({
       // Small delay to ensure any UI states are settled
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      const imgData = await toPng(reportRef.current, {
-        quality: 0.95,
-        backgroundColor: '#F8FAFC'
+      // Using toJpeg instead of toPng for better compression/file size control
+      const imgData = await toJpeg(reportRef.current, {
+        quality: 0.8, // Reduced from 0.95 to optimize size
+        backgroundColor: '#F8FAFC',
+        pixelRatio: 1.5 // Balance between quality and size
       });
       
       if (!imgData) throw new Error('Falha ao capturar imagem do relatório');
 
-      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdf = new jsPDF({
+        orientation: 'p',
+        unit: 'mm',
+        format: 'a4',
+        compress: true // Enable PDF compression
+      });
+
       const imgProps = pdf.getImageProperties(imgData);
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
@@ -417,13 +426,14 @@ function ExperimentContent({
       let position = 0;
       const pageHeight = pdf.internal.pageSize.getHeight();
 
-      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+      // Use JPEG format in addImage for smaller footprint
+      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight, undefined, 'MEDIUM');
       heightLeft -= pageHeight;
 
       while (heightLeft >= 0) {
         position = heightLeft - pdfHeight;
         pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+        pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight, undefined, 'MEDIUM');
         heightLeft -= pageHeight;
       }
 
@@ -674,20 +684,46 @@ function ExperimentContent({
                 onSelect={(id: string) => updateConfig(config.id, { ...config, config: id as any })}
               />
 
-              <div className="grid grid-cols-1 xl:grid-cols-5 gap-12">
-                <div className="xl:col-span-2">
-                  <ExperimentalDataEntry 
-                    data={config} 
-                    onChange={(newData) => updateConfig(config.id, newData)} 
-                    isExporting={isExporting}
-                  />
-                </div>
-                <div className="xl:col-span-3 space-y-8">
-                  <div className="bg-white rounded-[40px] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden h-[600px]">
-                    <InteractiveCanvas />
+              <div className="space-y-12">
+                <ExperimentalDataEntry 
+                  data={config} 
+                  onChange={(newData) => updateConfig(config.id, newData)} 
+                  isExporting={isExporting}
+                />
+                
+                {/* Geometry Parameters */}
+                <section className="space-y-6">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-slate-900 rounded-2xl text-white shadow-lg shadow-slate-200">
+                      <Ruler size={24} />
+                    </div>
+                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">Parâmetros Fixos da Geometria</h3>
                   </div>
-                  <FieldCalculator isExporting={isExporting} />
-                </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-8 bg-white rounded-[32px] border border-slate-100 shadow-sm">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Distância entre Eletrodos <span className="normal-case">(mm)</span></label>
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        value={config.plateDistance}
+                        onChange={(e) => updateConfig(config.id, { ...config, plateDistance: e.target.value.replace('.', ',') })}
+                        className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 outline-none font-bold text-lg transition-all"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Incerteza <span className="normal-case">(mm)</span></label>
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        value={config.plateDistanceUncertainty}
+                        onChange={(e) => updateConfig(config.id, { ...config, plateDistanceUncertainty: e.target.value.replace('.', ',') })}
+                        className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 outline-none text-slate-600 transition-all"
+                      />
+                    </div>
+                  </div>
+                </section>
+
+                <FieldCalculator isExporting={isExporting} />
               </div>
             </div>
           ))}
